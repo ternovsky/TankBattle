@@ -10,8 +10,10 @@ package com.ternovsky.model;
 public class Tank {
 
     private Coordinates coordinates;
+    private Direction direction = Direction.NORTH;
 
-    public Tank() {
+    public Tank(Coordinates coordinates) {
+        this.coordinates = coordinates;
     }
 
     public Coordinates getCoordinates() {
@@ -22,8 +24,11 @@ public class Tank {
         this.coordinates = coordinates;
     }
 
-    public Tank(Coordinates coordinates) {
+    public Direction getDirection() {
+        return direction;
+    }
 
-        this.coordinates = coordinates;
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 }

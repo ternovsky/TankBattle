@@ -19,10 +19,14 @@ import java.io.FileNotFoundException;
 public class ControlJPanel extends JPanel {
 
     public static final String LOAD_MAP = "Загрузить карту";
+    public static final String START = "Старт";
+
     private final JButton loadMapJButton;
+    private final JButton startJButton;
 
     public ControlJPanel(final GameJFrame gameJFrame) {
-        setLayout(new FlowLayout(FlowLayout.LEFT));
+        setLayout(new FlowLayout());
+
         loadMapJButton = new JButton(LOAD_MAP);
         loadMapJButton.addActionListener(new ActionListener() {
             @Override
@@ -33,11 +37,20 @@ public class ControlJPanel extends JPanel {
                 try {
                     Scene scene = Scene.getScene();
                     scene.readScene(mapJFileChooser.getSelectedFile());
-                    gameJFrame.getGameJPanel().showScene();
+                    gameJFrame.getGameCanvas().init();
                 } catch (FileNotFoundException e1) {
                 }
             }
         });
         add(loadMapJButton);
+
+        startJButton = new JButton(START);
+        startJButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameJFrame.getGameCanvas().start();
+            }
+        });
+        add(startJButton);
     }
 }

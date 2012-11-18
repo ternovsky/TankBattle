@@ -15,38 +15,30 @@ public class GameJFrame extends JFrame {
     public static final String TITLE = "Tank Battle";
     public static int WIDTH = 600;
     public static int HEIGHT = 500;
+
     private final ControlJPanel controlJPanel;
-    private final GameJPanel gameJPanel;
+    private final GameCanvas gameCanvas;
 
     public GameJFrame() {
         super(TITLE);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setSize(WIDTH, HEIGHT);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLayout(new BorderLayout());
 
-
         controlJPanel = new ControlJPanel(this);
         add(controlJPanel, BorderLayout.EAST);
 
-        JLayeredPane layeredPane = new JLayeredPane();
-        layeredPane.setLayout(new BorderLayout());
-
-        gameJPanel = new GameJPanel(this);
-        layeredPane.add(gameJPanel, 0);
-
-        AnimationCanvas animationCanvas = new AnimationCanvas();
-        layeredPane.add(animationCanvas, 1);
-
-        add(layeredPane);
+        gameCanvas = new GameCanvas();
+        add(gameCanvas, BorderLayout.CENTER);
     }
 
     public ControlJPanel getControlJPanel() {
         return controlJPanel;
     }
 
-    public GameJPanel getGameJPanel() {
-        return gameJPanel;
+    public GameCanvas getGameCanvas() {
+        return gameCanvas;
     }
 }
