@@ -1,8 +1,7 @@
-import com.ternovsky.Scene;
+import com.ternovsky.gui.GameJFrame;
 
-import java.io.File;
+import java.awt.*;
 import java.io.FileNotFoundException;
-import java.util.logging.Logger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,14 +12,12 @@ import java.util.logging.Logger;
  */
 public class Main {
 
-    public static final Logger LOGGER = Logger.getLogger(Main.class.getSimpleName());
-    public static final String FILENAME = "C:\\Users\\ternovsky\\Documents\\GitHub\\TankBattle\\src\\scene.txt";
-    public static final File SCENE_FILE = new File(FILENAME);
-
     public static void main(String[] args) throws FileNotFoundException {
-        LOGGER.info("Hello World!");
-        Scene scene = new Scene();
-        scene.readScene(SCENE_FILE);
-        LOGGER.info(scene.toString());
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new GameJFrame();
+            }
+        });
     }
 }
