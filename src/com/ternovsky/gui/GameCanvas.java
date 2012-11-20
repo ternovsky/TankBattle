@@ -1,14 +1,13 @@
 package com.ternovsky.gui;
 
-import com.ternovsky.model.Coordinates;
-import com.ternovsky.model.Direction;
-import com.ternovsky.model.Scene;
-import com.ternovsky.model.Tank;
+import com.ternovsky.model.*;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,20 +19,21 @@ import java.awt.image.BufferStrategy;
 public class GameCanvas extends Canvas implements Runnable {
 
     public static final int SIZE = 50;
-    private boolean running;
+    private volatile boolean running;
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private boolean upPressed = false;
     private boolean downPressed = false;
-
-    private static int x = 0;
-    private static int y = 0;
+    private final Scene scene = Scene.getScene();
 
     public void start() {
+        PathFinder pathFinder = new PathFinder();
+        List<Coordinates> coordinatesList = pathFinder.buildPath(scene.getComputerTank().getCoordinates(), scene.getUserTank().getCoordinates());
         running = true;
         new Thread(this).start();
     }
+
 
     public void run() {
         long lastTime = System.currentTimeMillis();
@@ -78,53 +78,56 @@ public class GameCanvas extends Canvas implements Runnable {
     }
 
     private void drawUserTank(Graphics g) {
-        Tank tank = Scene.getScene().getUserTank();
-        g.setColor(Color.GREEN);
-        drawTank(g, tank);
+        Tank tank = scene.getUserTank();
+        drawTank(g, tank, Color.GREEN);
     }
 
     private void drawComputerTank(Graphics g) {
-        Tank tank = Scene.getScene().getComputerTank();
-        g.setColor(Color.RED);
-        drawTank(g, tank);
+        Tank tank = scene.getComputerTank();
+        drawTank(g, tank, Color.RED);
     }
 
-    private void drawTank(Graphics g, Tank tank) {
+    private void drawTank(Graphics g, Tank tank, Color color) {
         Coordinates coordinates = tank.getCoordinates();
         Direction direction = tank.getDirection();
         int baseX = SIZE * coordinates.getColumn();
         int baseY = SIZE * coordinates.getRow();
+
+        g.setColor(Color.BLACK);
+        g.fillRect(baseX, baseY, SIZE, SIZE);
+
         Polygon polygon = new Polygon();
         switch (direction) {
             case SOUTH: {
                 polygon.addPoint(baseX, baseY);
-                polygon.addPoint(baseX + 50, baseY);
-                polygon.addPoint(baseX + 25, baseY + 50);
+                polygon.addPoint(baseX + SIZE, baseY);
+                polygon.addPoint(baseX + SIZE / 2, baseY + SIZE);
                 break;
             }
             case EAST: {
                 polygon.addPoint(baseX, baseY);
-                polygon.addPoint(baseX, baseY + 50);
-                polygon.addPoint(baseX + 50, baseY + 25);
+                polygon.addPoint(baseX, baseY + SIZE);
+                polygon.addPoint(baseX + SIZE, baseY + SIZE / 2);
                 break;
             }
             case WEST: {
-                polygon.addPoint(baseX + 50, baseY);
-                polygon.addPoint(baseX + 50, baseY + 50);
-                polygon.addPoint(baseX, baseY + 25);
+                polygon.addPoint(baseX + SIZE, baseY);
+                polygon.addPoint(baseX + SIZE, baseY + SIZE);
+                polygon.addPoint(baseX, baseY + SIZE / 2);
                 break;
             }
             case NORTH: {
-                polygon.addPoint(baseX + 25, baseY + 0);
-                polygon.addPoint(baseX + 0, baseY + 50);
-                polygon.addPoint(baseX + 50, baseY + 50);
+                polygon.addPoint(baseX + SIZE / 2, baseY);
+                polygon.addPoint(baseX, baseY + SIZE);
+                polygon.addPoint(baseX + SIZE, baseY + SIZE);
             }
         }
+        g.setColor(color);
         g.fillPolygon(polygon);
     }
 
     private void drawMap(Graphics g) {
-        Scene scene = Scene.getScene();
+        Scene scene = this.scene;
         for (int r = 0; r < scene.getRowCount(); r++) {
             for (int c = 0; c < scene.getColumnCount(); c++) {
                 char character = scene.getMap()[r][c];
@@ -142,15 +145,19 @@ public class GameCanvas extends Canvas implements Runnable {
 
     private boolean isSpace(int row, int column) {
         try {
-            char c = Scene.getScene().getMap()[row][column];
+            char c = scene.getMap()[row][column];
             return c == Scene.SPACE;
         } catch (IndexOutOfBoundsException e) {
             return false;
         }
     }
 
+    private void computerStep() {
+
+    }
+
     public void update(long delta) {
-        Scene scene = Scene.getScene();
+        Scene scene = this.scene;
         Tank userTank = scene.getUserTank();
         Coordinates coordinates = userTank.getCoordinates();
         int row = coordinates.getRow();
@@ -205,21 +212,6 @@ public class GameCanvas extends Canvas implements Runnable {
         }
     }
 
-    /*public Sprite getSprite(String path) {
-        BufferedImage sourceImage = null;
-
-        try {
-            URL url = this.getClass().getClassLoader().getResource(path);
-            sourceImage = ImageIO.read(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //Sprite sprite = new Sprite(Toolkit.getDefaultToolkit().createImage(sourceImage.getSource()));
-
-        return sprite;
-    }*/
-
     private class KeyInputHandler extends KeyAdapter {
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_LEFT) {
@@ -235,7 +227,6 @@ public class GameCanvas extends Canvas implements Runnable {
                 downPressed = true;
             }
         }
-
 
         @Override
         public void keyReleased(KeyEvent e) {
