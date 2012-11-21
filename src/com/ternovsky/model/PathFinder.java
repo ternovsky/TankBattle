@@ -13,10 +13,6 @@ public class PathFinder {
 
     private AlgorithmCoordinates[][] map;
 
-    public PathFinder() {
-
-    }
-
     private float distance(Coordinates coordinates1, Coordinates coordinates2) {
         int row1 = coordinates1.getRow();
         int column1 = coordinates1.getColumn();
@@ -29,14 +25,10 @@ public class PathFinder {
         Set<AlgorithmCoordinates> coordinatesSet = new HashSet<AlgorithmCoordinates>();
         int row = coordinates.getRow();
         int column = coordinates.getColumn();
-        addNotNull(coordinatesSet, row - 1, column - 1);
         addNotNull(coordinatesSet, row - 1, column);
-        addNotNull(coordinatesSet, row - 1, column + 1);
         addNotNull(coordinatesSet, row, column - 1);
         addNotNull(coordinatesSet, row, column + 1);
-        addNotNull(coordinatesSet, row + 1, column - 1);
         addNotNull(coordinatesSet, row + 1, column);
-        addNotNull(coordinatesSet, row + 1, column + 1);
         return coordinatesSet;
     }
 
@@ -57,7 +49,7 @@ public class PathFinder {
         AlgorithmCoordinates start = map[startCoordinates.getRow()][startCoordinates.getColumn()];
         AlgorithmCoordinates finish = map[finishCoordinates.getRow()][finishCoordinates.getColumn()];
 
-        Set<AlgorithmCoordinates> openedCoordinates = new TreeSet<AlgorithmCoordinates>();
+        Set<AlgorithmCoordinates> openedCoordinates = new HashSet<AlgorithmCoordinates>();
         Set<AlgorithmCoordinates> closedCoordinates = new HashSet<AlgorithmCoordinates>();
         openedCoordinates.add(start);
 
@@ -100,6 +92,7 @@ public class PathFinder {
             coordinatesList.add(new Coordinates(currentCoordinates.getRow(), currentCoordinates.getColumn()));
             currentCoordinates = currentCoordinates.previousCoordinates;
         }
+        Collections.reverse(coordinatesList);
         return coordinatesList;
     }
 
@@ -120,7 +113,7 @@ public class PathFinder {
         }
     }
 
-    private class AlgorithmCoordinates extends Coordinates implements Comparable<AlgorithmCoordinates> {
+    private class AlgorithmCoordinates extends Coordinates {
 
         float path;
         float distance;
@@ -129,33 +122,6 @@ public class PathFinder {
 
         public AlgorithmCoordinates(int row, int column) {
             super(row, column);
-        }
-
-        @Override
-        public int compareTo(AlgorithmCoordinates o) {
-            if (this.equals(o)) {
-                return 0;
-            } else {
-                return this.distance > o.distance ? 1 : -1;
-            }
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = super.hashCode();
-            result = 31 * result + (path != +0.0f ? Float.floatToIntBits(path) : 0);
-            result = 31 * result + (distance != +0.0f ? Float.floatToIntBits(distance) : 0);
-            result = 31 * result + (heuristic != +0.0f ? Float.floatToIntBits(heuristic) : 0);
-            result = 31 * result + (previousCoordinates != null ? previousCoordinates.hashCode() : 0);
-            return result;
         }
     }
 }
